@@ -14,6 +14,8 @@ const DEFAULT_LNG = -117.8366916914015
 export default function MapScreen() {
   const navigation = useNavigation()
   const [location, setLocation] = useState<any>(null)
+  const navigation = useNavigation()
+  const [location, setLocation] = useState<any>(null)
 
   useEffect(() => {
     (async () => {
@@ -32,6 +34,8 @@ export default function MapScreen() {
       <View style={styles.loading}>
         <ActivityIndicator size="large" color={C.primary} />
         <Text style={styles.loadingText}>Loading map...</Text>
+        <ActivityIndicator size="large" color={C.primary} />
+        <Text style={styles.loadingText}>Loading map...</Text>
       </View>
     )
   }
@@ -39,7 +43,11 @@ export default function MapScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+          <Ionicons name="menu" size={26} color={C.headerText} />
           <Ionicons name="menu" size={26} color={C.headerText} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Map</Text>
@@ -54,6 +62,7 @@ export default function MapScreen() {
     </SafeAreaView>
   )
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.background },
