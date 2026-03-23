@@ -3,10 +3,13 @@ import { DrawerActions, useNavigation } from '@react-navigation/native'
 import * as Location from 'expo-location'
 import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import MapView, { Marker } from 'react-native-maps'
+import MapContent from '../../components/MapContent'
 import { Colors, Spacing, FontSize } from '../../constants'
 
 const C = Colors.light
+
+const DEFAULT_LAT = 33.644466014206564
+const DEFAULT_LNG = -117.8366916914015
 
 export default function MapScreen() {
   const navigation = useNavigation()
@@ -42,22 +45,12 @@ export default function MapScreen() {
         <Text style={styles.headerTitle}>Map</Text>
         <View style={{ width: 26 }} />
       </View>
-
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: 33.644466014206564,
-          longitude: -117.8366916914015,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-      >
-        <Marker
-          coordinate={{ latitude: 33.644466014206564, longitude: -117.8366916914015 }}
-          title="Middle Earth Basketball Court"
-          description="6 NEEDED"
-        />
-      </MapView>
+      <MapContent
+        latitude={DEFAULT_LAT}
+        longitude={DEFAULT_LNG}
+        title="Middle Earth Basketball Court"
+        description="6 NEEDED"
+      />
     </SafeAreaView>
   )
 }
@@ -73,7 +66,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
   },
   headerTitle: { color: C.headerText, fontSize: FontSize.xl, fontWeight: '700' },
-  map: { flex: 1 },
   loading: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: Spacing.md },
   loadingText: { fontSize: FontSize.md, color: C.textSecondary },
 })
