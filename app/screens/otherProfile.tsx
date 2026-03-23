@@ -1,86 +1,81 @@
 // app/screens/otherProfile.tsx
 
 import { Ionicons } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
 import { useRouter } from 'expo-router'
 import React from 'react'
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
 
-export default function otherProfile() {
-  const navigation = useNavigation()
+const C = Colors.light
+
+export default function OtherProfile() {
   const router = useRouter()
-
-    const onSubmit = () => {
-      router.replace('/screens/forum')
-    }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push('/screens/forum')}>
-          <Ionicons name="arrow-back" size={28} color="#fff"/>
+          <Ionicons name="arrow-back" size={24} color={C.headerText} />
         </TouchableOpacity>
-        <View style={{ width: 28 }} />
+        <Text style={styles.headerTitle}>Profile</Text>
+        <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
-        <Image source={require('../../assets/images/profile.png')} style={styles.profileImage} />
-        <Text style={styles.username}>tennislover134</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.profileSection}>
+          <Image source={require('../../assets/images/profile.png')} style={styles.profileImage} />
+          <Text style={styles.username}>tennislover134</Text>
 
-        <View style={styles.stars}>
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star" size={20} color="#FFD700" />
-          <Ionicons name="star-outline" size={20} color="#FFD700" />
+          <View style={styles.stars}>
+            {[1, 2, 3, 4].map((i) => <Ionicons key={i} name="star" size={18} color="#FBBF24" />)}
+            <Ionicons name="star-outline" size={18} color="#FBBF24" />
+          </View>
+
+          <Text style={styles.followInfo}>123 Followers  ·  97 Following</Text>
+
+          <View style={styles.buttonRow}>
+            <TouchableOpacity style={styles.primaryBtn} activeOpacity={0.8}>
+              <Ionicons name="person-add-outline" size={16} color="#fff" />
+              <Text style={styles.primaryBtnText}>Follow</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.secondaryBtn} activeOpacity={0.7}>
+              <Ionicons name="people-outline" size={16} color={C.primary} />
+              <Text style={styles.secondaryBtnText}>Add Friend</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              activeOpacity={0.7}
+              onPress={() => router.push({ pathname: '/screens/direct_message', params: { user: 'tennislover134' } })}
+            >
+              <Ionicons name="chatbubble-outline" size={16} color={C.primary} />
+              <Text style={styles.secondaryBtnText}>Message</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.followInfo}>
-          <Text style={styles.followLabel}>123 Followers</Text>
-          <Text style={styles.followLabel}> · </Text>
-          <Text style={styles.followLabel}>97 Following</Text>
+        <View style={styles.card}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Favorite Sports</Text>
+            <Text style={styles.infoValue}>Tennis, Badminton, Soccer</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Skill Level</Text>
+            <Text style={styles.infoValue}>Tennis (3 yrs), Badminton (2 yrs), Soccer (5 yrs)</Text>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Bio</Text>
+            <Text style={styles.infoValue}>Just a student athlete who loves hitting the court. Always down for a match and meeting new players!</Text>
+          </View>
         </View>
 
-        <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionText}>Follow</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionButton}>
-            <Text style={styles.actionText}>Add Friend</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() =>
-              router.push({
-                pathname: '/screens/direct_message',
-                params: { user: 'tennislover134' },
-              })
-            }>
-            <Text style={styles.actionText}>Message</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Favorite Sport(s)</Text>
-          <Text style={styles.sectionValue}>Tennis, Badminton, Soccer</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Skill Level</Text>
-          <Text style={styles.sectionValue}>Tennis (3 yrs), Badminton (2 yrs), Soccer (5 yrs)</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Bio</Text>
-          <Text style={styles.sectionValue}>Just a student athlete who loves hitting the court. Always down for a match and meeting new players!</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Recent Friends</Text>
+        <View style={styles.card}>
+          <Text style={styles.infoLabel}>Recent Friends</Text>
           <View style={styles.friendRow}>
-            <Image source={require('../../assets/images/profile.png')} style={styles.friendImage} />
-            <Image source={require('../../assets/images/profile.png')} style={styles.friendImage} />
-            <Image source={require('../../assets/images/profile.png')} style={styles.friendImage} />
+            {[1, 2, 3].map((i) => (
+              <Image key={i} source={require('../../assets/images/profile.png')} style={styles.friendImage} />
+            ))}
           </View>
         </View>
       </ScrollView>
@@ -89,80 +84,56 @@ export default function otherProfile() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, backgroundColor: C.background },
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#000',
-    marginTop: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: C.headerBg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginTop: 20,
-  },
-  username: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginTop: 8,
-  },
-  stars: {
+  headerTitle: { color: C.headerText, fontSize: FontSize.xl, fontWeight: '700' },
+  scrollContent: { paddingHorizontal: Spacing.xl, paddingBottom: Spacing.xxxl },
+  profileSection: { alignItems: 'center', marginVertical: Spacing.xxl },
+  profileImage: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: C.primary },
+  username: { fontSize: FontSize.xxl, fontWeight: '700', color: C.text, marginTop: Spacing.sm },
+  stars: { flexDirection: 'row', marginTop: Spacing.xs, gap: 2 },
+  followInfo: { fontSize: FontSize.sm, color: C.textSecondary, marginTop: Spacing.xs },
+  buttonRow: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.lg },
+  primaryBtn: {
     flexDirection: 'row',
-    marginTop: 6,
+    alignItems: 'center',
+    gap: Spacing.xs,
+    backgroundColor: C.primary,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.full,
   },
-  followInfo: {
+  primaryBtnText: { color: '#fff', fontSize: FontSize.sm, fontWeight: '600' },
+  secondaryBtn: {
     flexDirection: 'row',
-    marginTop: 6,
+    alignItems: 'center',
+    gap: Spacing.xs,
+    borderWidth: 1,
+    borderColor: C.primary,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.full,
   },
-  followLabel: {
-    fontSize: 14,
-    color: '#555',
+  secondaryBtnText: { color: C.primary, fontSize: FontSize.sm, fontWeight: '600' },
+  card: {
+    backgroundColor: C.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.xl,
+    borderWidth: 1,
+    borderColor: C.border,
+    marginBottom: Spacing.lg,
   },
-  actionButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-  },
-  actionText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  section: {
-    width: '85%',
-    marginTop: 20,
-  },
-  sectionLabel: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 6,
-  },
-  sectionValue: {
-    backgroundColor: '#eee',
-    padding: 10,
-    borderRadius: 5,
-    fontSize: 15,
-  },
-  friendRow: {
-    flexDirection: 'row',
-    marginTop: 10,
-  },
-  friendImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10,
-    marginTop: 12,
-  },
+  infoRow: { paddingVertical: Spacing.sm },
+  infoLabel: { fontSize: FontSize.sm, fontWeight: '700', color: C.text, marginBottom: Spacing.xs },
+  infoValue: { fontSize: FontSize.md, color: C.textSecondary, lineHeight: 22 },
+  divider: { height: 1, backgroundColor: C.border, marginVertical: Spacing.xs },
+  friendRow: { flexDirection: 'row', marginTop: Spacing.md, gap: Spacing.sm },
+  friendImage: { width: 48, height: 48, borderRadius: BorderRadius.full },
 })

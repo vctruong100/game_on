@@ -1,159 +1,259 @@
 // app/signup.tsx
 
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import { useRouter, Link } from 'expo-router'
 import { AntDesign, FontAwesome, Ionicons } from '@expo/vector-icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '../constants'
+
+const C = Colors.light
 
 export default function SignUp() {
-      const router = useRouter()
-      const [email, setEmail] = useState('')
-      const [password, setPassword] = useState('')
-      const [confirm, setConfirm] = useState('')
-      const [agreed, setAgreed] = useState(false)
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
+  const [agreed, setAgreed] = useState(false)
 
-    const onSubmit = () => {
-      router.replace('/screens/profile')
-    }
+  const onSubmit = () => {
+    router.replace('/screens/profile')
+  }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.appName}>Game-On</Text>
-      <Text style={styles.pageTitle}>Sign Up</Text>
+    <KeyboardAvoidingView
+      style={styles.wrapper}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        <View style={styles.logoContainer}>
+          <Ionicons name="football-outline" size={48} color={C.primary} />
+          <Text style={styles.appName}>Game-On</Text>
+        </View>
+        <Text style={styles.pageTitle}>Create Account</Text>
+        <Text style={styles.subtitle}>Find your next sports partner</Text>
 
-      <View style={styles.field}>
-        <Text>Email:</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-      </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            placeholder="you@example.com"
+            placeholderTextColor={C.placeholder}
+          />
+        </View>
 
-      <View style={styles.field}>
-        <Text>Password:</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-      </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholder="Create a password"
+            placeholderTextColor={C.placeholder}
+          />
+        </View>
 
-      <View style={styles.field}>
-        <Text>Re-enter Password:</Text>
-        <TextInput
-          style={styles.input}
-          value={confirm}
-          onChangeText={setConfirm}
-          secureTextEntry
-        />
-      </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <TextInput
+            style={styles.input}
+            value={confirm}
+            onChangeText={setConfirm}
+            secureTextEntry
+            placeholder="Re-enter your password"
+            placeholderTextColor={C.placeholder}
+          />
+        </View>
 
-      <View style={styles.termsContainer}>
         <TouchableOpacity
-          style={styles.terms}
+          style={styles.termsRow}
           onPress={() => setAgreed(!agreed)}
+          activeOpacity={0.7}
         >
-          {agreed
-            ? <AntDesign name="checksquare" size={24} />
-            : <AntDesign name="minussquareo" size={24} />
-          }
-          <Text style={styles.link}>Agree to T&C</Text>
+          <AntDesign
+            name={agreed ? 'checksquare' : 'checksquareo'}
+            size={22}
+            color={agreed ? C.primary : C.icon}
+          />
+          <Text style={styles.termsText}>
+            I agree to the <Text style={styles.termsLink}>Terms & Conditions</Text>
+          </Text>
         </TouchableOpacity>
-      </View>
 
-      <View style={styles.social}>
-        <TouchableOpacity>
-          <FontAwesome name="google" size={32} />
+        <TouchableOpacity
+          style={[styles.button, !agreed && styles.buttonDisabled]}
+          onPress={onSubmit}
+          disabled={!agreed}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <AntDesign name="facebook-square" size={32} />
-        </TouchableOpacity>
-        <TouchableOpacity>
-          <Ionicons name="logo-apple" size={32} />
-        </TouchableOpacity>
-      </View>
 
-      <TouchableOpacity style={styles.button} onPress={onSubmit}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+        <View style={styles.dividerRow}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>or continue with</Text>
+          <View style={styles.dividerLine} />
+        </View>
 
-      <Link href="/screens/login" style={styles.signinLink}>
-        or click to Sign In
-      </Link>
+        <View style={styles.social}>
+          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.7}>
+            <FontAwesome name="google" size={22} color={C.text} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.7}>
+            <AntDesign name="facebook-square" size={22} color={C.text} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.socialBtn} activeOpacity={0.7}>
+            <Ionicons name="logo-apple" size={22} color={C.text} />
+          </TouchableOpacity>
+        </View>
 
-      <Text style={styles.footer}>
-        Made by Special Valuable Group (SVG)
-      </Text>
-    </View>
+        <View style={styles.footerRow}>
+          <Text style={styles.footerText}>Already have an account? </Text>
+          <Link href="/screens/login" asChild>
+            <TouchableOpacity activeOpacity={0.7}>
+              <Text style={styles.footerLink}>Sign In</Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
     flex: 1,
-    padding: 24,
+    backgroundColor: C.background,
+  },
+  container: {
+    flexGrow: 1,
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    paddingHorizontal: Spacing.xxl,
+    paddingVertical: Spacing.xxxl,
+  },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   appName: {
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 4,
+    fontSize: FontSize.xxl,
+    fontWeight: '800',
+    color: C.primary,
   },
   pageTitle: {
-    fontSize: 32,
+    fontSize: FontSize.xxxl,
+    fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 24,
+    color: C.text,
+    marginBottom: Spacing.xs,
+  },
+  subtitle: {
+    fontSize: FontSize.md,
+    color: C.textSecondary,
+    textAlign: 'center',
+    marginBottom: Spacing.xxl,
   },
   field: {
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
+  },
+  label: {
+    fontSize: FontSize.sm,
+    fontWeight: '600',
+    color: C.text,
+    marginBottom: Spacing.xs,
   },
   input: {
-    backgroundColor: '#eee',
-    padding: 12,
-    marginTop: 4,
+    backgroundColor: C.inputBg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    fontSize: FontSize.md,
+    color: C.text,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  termsContainer: {
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  terms: {
+  termsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.xl,
   },
-  link: {
-    color: '#0066cc',
-    textDecorationLine: 'underline',
-    marginLeft: 8,
+  termsText: {
+    fontSize: FontSize.sm,
+    color: C.textSecondary,
   },
-  social: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 24,
+  termsLink: {
+    color: C.primary,
+    fontWeight: '600',
   },
   button: {
-    backgroundColor: '#2ecc71',
-    paddingVertical: 16,
+    backgroundColor: C.primary,
+    paddingVertical: Spacing.lg,
+    borderRadius: BorderRadius.lg,
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: Spacing.xl,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: FontSize.lg,
+    fontWeight: '700',
   },
-  signinLink: {
-    textAlign: 'center',
-    color: '#0066cc',
-    marginBottom: 24,
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.xl,
   },
-  footer: {
-    textAlign: 'center',
-    color: '#999',
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: C.border,
+  },
+  dividerText: {
+    marginHorizontal: Spacing.md,
+    fontSize: FontSize.xs,
+    color: C.textSecondary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  social: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: Spacing.lg,
+    marginBottom: Spacing.xxl,
+  },
+  socialBtn: {
+    width: 52,
+    height: 52,
+    borderRadius: BorderRadius.md,
+    backgroundColor: C.surface,
+    borderWidth: 1,
+    borderColor: C.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: FontSize.sm,
+    color: C.textSecondary,
+  },
+  footerLink: {
+    fontSize: FontSize.sm,
+    fontWeight: '700',
+    color: C.primary,
   },
 })

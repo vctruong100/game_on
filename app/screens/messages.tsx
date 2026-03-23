@@ -4,12 +4,13 @@ import { Ionicons } from '@expo/vector-icons'
 import { DrawerActions, useNavigation } from '@react-navigation/native'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { FlatList, Image, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
 import { Message, messagesData } from '../../script/messageData'
 
-const allContacts = Array.from(
-    new Set(messagesData.map((m) => m.sender))
-)
+const C = Colors.light
+
+const allContacts = Array.from(new Set(messagesData.map((m) => m.sender)))
 
 export default function Messages() {
   const router = useRouter()
@@ -17,8 +18,6 @@ export default function Messages() {
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([])
   const [showModal, setShowModal] = useState(false)
-  const [newMessageText, setNewMessageText] = useState('')
-  const [newRecipient, setNewRecipient] = useState('')
   const [contactQuery, setContactQuery] = useState('')
 
   useEffect(() => {
@@ -28,11 +27,7 @@ export default function Messages() {
   const filteredMessages = messages.filter((msg) => {
     const query = input.trim().toLowerCase()
     if (query === '') return true
-
-    return (
-      msg.sender.toLowerCase().includes(query) ||
-      msg.preview.toLowerCase().includes(query)
-    )
+    return msg.sender.toLowerCase().includes(query) || msg.preview.toLowerCase().includes(query)
   })
 
   const filteredContacts = allContacts.filter((contact) => {
@@ -41,103 +36,98 @@ export default function Messages() {
     return contact.toLowerCase().includes(query)
   })
 
+  const renderMessage = ({ item: msg }: { item: Message }) => (
+    <TouchableOpacity
+      style={styles.msgRow}
+      activeOpacity={0.7}
+      onPress={() => router.push({ pathname: '/screens/direct_message', params: { user: msg.sender } })}
+    >
+      <Image source={require('../../assets/images/profile.png')} style={styles.avatar} />
+      <View style={styles.msgBody}>
+        <Text style={styles.senderName}>{msg.sender}</Text>
+        <Text style={styles.preview} numberOfLines={1}>{msg.preview}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={C.border} />
+    </TouchableOpacity>
+  )
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-          <Ionicons name="menu" size={28} color="#fff" />
+        <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
+          <Ionicons name="menu" size={26} color={C.headerText} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Messages</Text>
         <TouchableOpacity onPress={() => setShowModal(true)}>
-          <Ionicons name="add" size={28} color="#fff" />
+          <Ionicons name="create-outline" size={24} color={C.headerText} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.field}>
-        <View style={styles.searchSection}>
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              style={styles.searchIcon}
-              name="search"
-              size={20}
-              color="#787878"/>
-            <TextInput
-              style={styles.input}
-              onChangeText={setInput}
-              value={input}
-              placeholder="Search"
-              placeholderTextColor="#787878"
-            />
-          </View>
+      <View style={styles.searchArea}>
+        <View style={styles.searchInputWrapper}>
+          <Ionicons name="search" size={18} color={C.placeholder} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            onChangeText={setInput}
+            value={input}
+            placeholder="Search messages..."
+            placeholderTextColor={C.placeholder}
+          />
         </View>
       </View>
-      <ScrollView>
-        <View style={styles.field}>
-          {filteredMessages.map((msg) => {
-            const rowContent = (
-              <View style={styles.post} key={msg.id}>
-                <Image
-                  source={require('../../assets/images/profile.png')}
-                  style={styles.profileImage}/>
-                <View style={styles.textArea}>
-                  <Text style={styles.label}>{msg.sender}</Text>
-                  <Text style={styles.info}>{msg.preview}</Text>
-                </View>
-              </View>
-            )
-            return (
-              <TouchableOpacity
-                key={msg.id}
-                onPress={() =>
-                  router.push({
-                    pathname: '/screens/direct_message',
-                    params: { user: msg.sender },
-                  })
-                }>
-                {rowContent}
-              </TouchableOpacity>
-            )
-          })}
-        </View>
-      </ScrollView>
-      <Modal visible={showModal} animationType="slide" transparent>
-        <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
-        <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-          <View style={styles.modalContainer}>
-            <TextInput
-              placeholder="Search contacts"
-              style={[styles.input, { marginBottom: 12 }]}
-              value={contactQuery}
-              onChangeText={setContactQuery}/>
-            <ScrollView style={{ maxHeight: 250, marginBottom: 16 }}>
-              {filteredContacts.map((contact) => (
-                <TouchableOpacity
-                  key={contact}
-                  style={styles.contactRow}
-                  onPress={() => {
-                    setNewRecipient(contact)
-                    setShowModal(false)
-                    setNewRecipient('')
-                    setContactQuery('')
-                    router.push({
-                      pathname: '/screens/direct_message',
-                      params: { user: contact },
-                    })
-                  }}>
-                  <Text style={styles.contactName}>{contact}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <TouchableOpacity onPress={() => setShowModal(false)}>
-                <Text style={{ color: 'red' }}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
+
+      <FlatList
+        data={filteredMessages}
+        keyExtractor={(item) => item.id}
+        renderItem={renderMessage}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Ionicons name="mail-outline" size={48} color={C.border} />
+            <Text style={styles.emptyText}>No messages yet</Text>
           </View>
-        </TouchableWithoutFeedback>
-        </View>
+        }
+      />
+
+      <Modal visible={showModal} animationType="fade" transparent>
+        <TouchableWithoutFeedback onPress={() => setShowModal(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>New Message</Text>
+                <View style={styles.modalSearchWrapper}>
+                  <Ionicons name="search" size={16} color={C.placeholder} style={{ position: 'absolute', left: 12, zIndex: 1 }} />
+                  <TextInput
+                    placeholder="Search contacts..."
+                    placeholderTextColor={C.placeholder}
+                    style={styles.modalSearchInput}
+                    value={contactQuery}
+                    onChangeText={setContactQuery}
+                  />
+                </View>
+                <ScrollView style={{ maxHeight: 250 }}>
+                  {filteredContacts.map((contact) => (
+                    <TouchableOpacity
+                      key={contact}
+                      style={styles.contactRow}
+                      activeOpacity={0.7}
+                      onPress={() => {
+                        setShowModal(false)
+                        setContactQuery('')
+                        router.push({ pathname: '/screens/direct_message', params: { user: contact } })
+                      }}
+                    >
+                      <Image source={require('../../assets/images/profile.png')} style={styles.contactAvatar} />
+                      <Text style={styles.contactName}>{contact}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)} activeOpacity={0.7}>
+                  <Text style={styles.cancelText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
         </TouchableWithoutFeedback>
       </Modal>
     </SafeAreaView>
@@ -145,112 +135,78 @@ export default function Messages() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
+  container: { flex: 1, backgroundColor: C.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#000',
-    marginTop: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: C.headerBg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  field: {
-    marginTop: 16,
-    marginBottom: 16,
-    paddingHorizontal: 30,
-  },
-  profileImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
-    marginTop: 6,
-    position: 'absolute',
-  },
-  label: {
-    fontWeight: 'bold',
-    fontSize: 23,
-  },
-  info: {
-    fontSize: 18,
-    marginTop: 4,
-  },
-  post: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-  },
-  textArea: {
-    marginLeft: 100,
-  },
-  searchSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  inputWrapper: {
-    flex: 1,
-    position: 'relative',
-    justifyContent: 'center',
-  },
-  searchIcon: {
-    position: 'absolute',
-    left: 12,
-  },
-  input: {
-    backgroundColor: '#eee',
-    height: 40,
-    borderRadius: 20,
+  headerTitle: { color: C.headerText, fontSize: FontSize.xl, fontWeight: '700' },
+  searchArea: { paddingHorizontal: Spacing.lg, paddingVertical: Spacing.md },
+  searchInputWrapper: { position: 'relative', justifyContent: 'center' },
+  searchIcon: { position: 'absolute', left: Spacing.md, zIndex: 1 },
+  searchInput: {
+    backgroundColor: C.inputBg,
+    height: 42,
+    borderRadius: BorderRadius.xl,
     paddingLeft: 40,
-    paddingRight: 12,
-    fontSize: 16,
+    paddingRight: Spacing.lg,
+    fontSize: FontSize.md,
+    color: C.text,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  filterButton: {
-    marginLeft: 10,
-    backgroundColor: '#eee',
-    borderRadius: 20,
-    padding: 8,
-    justifyContent: 'center',
+  listContent: { paddingHorizontal: Spacing.lg, paddingBottom: Spacing.xxxl },
+  msgRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: C.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: C.border,
+    gap: Spacing.md,
   },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  avatar: { width: 48, height: 48, borderRadius: BorderRadius.full },
+  msgBody: { flex: 1 },
+  senderName: { fontSize: FontSize.md, fontWeight: '700', color: C.text, marginBottom: 2 },
+  preview: { fontSize: FontSize.sm, color: C.textSecondary },
+  emptyState: { alignItems: 'center', paddingVertical: Spacing.xxxl * 2, gap: Spacing.md },
+  emptyText: { fontSize: FontSize.md, color: C.textSecondary },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContainer: {
-    width: '80%',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
+    width: '85%',
+    backgroundColor: C.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.xl,
   },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+  modalTitle: { fontSize: FontSize.xl, fontWeight: '700', color: C.text, marginBottom: Spacing.lg },
+  modalSearchWrapper: { position: 'relative', justifyContent: 'center', marginBottom: Spacing.md },
+  modalSearchInput: {
+    backgroundColor: C.inputBg,
+    height: 40,
+    borderRadius: BorderRadius.md,
+    paddingLeft: 36,
+    paddingRight: Spacing.md,
+    fontSize: FontSize.md,
+    color: C.text,
+    borderWidth: 1,
+    borderColor: C.border,
   },
   contactRow: {
-    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderColor: '#ddd',
+    borderColor: C.border,
   },
-  contactName: {
-    fontSize: 18,
-  },
-
+  contactAvatar: { width: 36, height: 36, borderRadius: BorderRadius.full },
+  contactName: { fontSize: FontSize.md, color: C.text, fontWeight: '500' },
+  cancelBtn: { alignItems: 'center', marginTop: Spacing.lg, paddingVertical: Spacing.sm },
+  cancelText: { fontSize: FontSize.md, color: C.accent, fontWeight: '600' },
 })
