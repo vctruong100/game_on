@@ -4,18 +4,21 @@ import { Ionicons } from '@expo/vector-icons'
 import { DrawerActions, useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { FlatList, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
 import { forumData, ForumPost } from '../../script/forumData'
 import AddPostModal from './AddPostModal'
 
-export default function Home(props) {
-  const navigation = useNavigation();
-  const route = props.route;
+const C = Colors.light
+
+export default function Forum(props: any) {
+  const navigation = useNavigation()
+  const route = props.route
   const router = useRouter()
   const [input, setInput] = useState('')
   const [posts, setPosts] = useState<ForumPost[]>([])
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [filters, setFilters] = useState(null)
+  const [filters, setFilters] = useState<any>(null)
 
   useEffect(() => {
     setPosts([...forumData])
@@ -53,85 +56,114 @@ export default function Home(props) {
     return true
   })
 
+  const sportColor = (sport: string) => {
+    const map: Record<string, string> = {
+      Basketball: C.accent,
+      Tennis: C.success,
+      Pickleball: C.warning,
+    }
+    return map[sport] ?? C.primary
+  }
+
+  const renderPost = ({ item: post }: { item: ForumPost }) => (
+    <TouchableOpacity
+      style={styles.postCard}
+      activeOpacity={0.7}
+      onPress={() => router.push('/screens/otherProfile')}
+    >
+      <Image
+        source={require('../../assets/images/profile.png')}
+        style={styles.avatar}
+      />
+      <View style={styles.postBody}>
+        <Text style={styles.postTitle} numberOfLines={2}>{post.message}</Text>
+        <Text style={styles.postMeta}>
+          {post.author}  ·  {post.time}  ·  {post.needed}
+        </Text>
+        <View style={styles.tagRow}>
+          <View style={[styles.sportBadge, { backgroundColor: sportColor(post.sport) + '20' }]}>
+            <Text style={[styles.sportBadgeText, { color: sportColor(post.sport) }]}>{post.sport}</Text>
+          </View>
+          <View style={styles.locationRow}>
+            <Ionicons name="location-outline" size={13} color={C.textSecondary} />
+            <Text style={styles.locationText}>{post.location}</Text>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
+  )
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())}>
-        {/*<TouchableOpacity onPress={() => router.push('/signup')}>*/}
-          <Ionicons name="menu" size={28} color="#fff" />
+          <Ionicons name="menu" size={26} color={C.headerText} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Forum</Text>
         <TouchableOpacity onPress={() => setIsModalVisible(true)}>
-          <Ionicons name="add" size={28} color="#fff" />
+          <Ionicons name="add-circle-outline" size={26} color={C.headerText} />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.field}>
+      <View style={styles.searchArea}>
         {filters && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-            <Text>Filters: </Text>
-            <Text>Sport: {filters.sport} </Text>
-            <Text>Location: {filters.location} </Text>
-            <Text>Skill: {filters.skill} </Text>
-            <TouchableOpacity onPress={clearFilters} style={{ marginLeft: 8 }}>
-              <Ionicons name="close-circle" size={20} color="red" />
+          <View style={styles.filterChips}>
+            {filters.sport !== 'All' && (
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>{filters.sport}</Text>
+              </View>
+            )}
+            {!!filters.location && (
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>{filters.location}</Text>
+              </View>
+            )}
+            {!!filters.skill && (
+              <View style={styles.chip}>
+                <Text style={styles.chipText}>{filters.skill}</Text>
+              </View>
+            )}
+            <TouchableOpacity onPress={clearFilters} style={styles.clearChip}>
+              <Ionicons name="close-circle" size={18} color={C.accent} />
+              <Text style={styles.clearChipText}>Clear</Text>
             </TouchableOpacity>
           </View>
         )}
-        <View style={styles.searchSection}>
-          <View style={styles.inputWrapper}>
-            <Ionicons
-              style={styles.searchIcon}
-              name="search"
-              size={20}
-              color="#787878"
-            />
+        <View style={styles.searchRow}>
+          <View style={styles.searchInputWrapper}>
+            <Ionicons name="search" size={18} color={C.placeholder} style={styles.searchIcon} />
             <TextInput
-              style={styles.input}
+              style={styles.searchInput}
               onChangeText={setInput}
               value={input}
-              placeholder="Search"
-              placeholderTextColor="#787878"
+              placeholder="Search posts..."
+              placeholderTextColor={C.placeholder}
             />
           </View>
-          <TouchableOpacity style={styles.filterButton} onPress={() => { console.log('Filter button pressed'); navigation.navigate('FilterScreen'); }}>
-            <Ionicons
-              name="filter"
-              size={20}
-              color="#787878"
-            />
+          <TouchableOpacity
+            style={styles.filterBtn}
+            onPress={() => navigation.navigate('FilterScreen' as never)}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="options-outline" size={20} color={C.primary} />
           </TouchableOpacity>
         </View>
       </View>
-        
-      <ScrollView>
-        <View style={styles.field}>
-          {filteredPosts.map((post) => (
-            <View style={styles.post} key={post.id}>
-              <TouchableOpacity onPress={() => router.push('/screens/otherProfile')}>
-                <Image
-                  source={require('../../assets/images/profile.png')}
-                  style={styles.profileImage}
-                />
-              </TouchableOpacity>
-              <View style={styles.textArea}>
-                <Text style={styles.label}>{post.message}</Text>
-                <Text style={styles.info}>
-                  {post.author} @ {post.time} | {post.needed}
-                </Text>
-                <Text style={styles.location}>
-                  {post.sport}{' '}
-                  <Ionicons name="location" size={15} color="#787878" />
-                  {post.location}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
+
+      <FlatList
+        data={filteredPosts}
+        keyExtractor={(item) => item.id}
+        renderItem={renderPost}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Ionicons name="chatbubble-ellipses-outline" size={48} color={C.border} />
+            <Text style={styles.emptyText}>No posts found</Text>
+          </View>
+        }
+      />
 
       <AddPostModal visible={isModalVisible} onClose={closeModal} />
-
     </SafeAreaView>
   )
 }
@@ -139,95 +171,152 @@ export default function Home(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.background,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#000',
-    marginTop: 0,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: C.headerBg,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
   },
   headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
+    color: C.headerText,
+    fontSize: FontSize.xl,
+    fontWeight: '700',
   },
-  field: {
-    marginTop: 16,
-    marginBottom: 16,
-    paddingHorizontal: 30,
+  searchArea: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.sm,
   },
-  profileImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 10,
-    marginTop: 6,
-    position: 'absolute'
+  filterChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
-  label: {
-    fontWeight: 'bold',
-    fontSize: 23
+  chip: {
+    backgroundColor: C.primaryLight,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: BorderRadius.full,
   },
-  info: {
-    fontSize: 18
+  chipText: {
+    fontSize: FontSize.xs,
+    fontWeight: '600',
+    color: C.primary,
   },
-  location: {
-    fontSize: 15
-  },
-  post: {
-    padding: 6,
-    paddingBottom: 15
-  },
-  textArea: {
-    marginLeft: 100
-  },
-  searchSection: {
+  clearChip: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
   },
-  inputWrapper: {
+  clearChipText: {
+    fontSize: FontSize.xs,
+    color: C.accent,
+    fontWeight: '600',
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  searchInputWrapper: {
     flex: 1,
     position: 'relative',
     justifyContent: 'center',
   },
   searchIcon: {
     position: 'absolute',
-    left: 12,
+    left: Spacing.md,
+    zIndex: 1,
   },
-  filterIcon: {
-    position: 'absolute',
-    paddingTop: 8,
-    paddingRight: 3,
-    marginLeft: '93%'
-  },
-  input: {
-    backgroundColor: '#eee',
-    height: 40,
-    borderRadius: 20,
+  searchInput: {
+    backgroundColor: C.inputBg,
+    height: 42,
+    borderRadius: BorderRadius.xl,
     paddingLeft: 40,
-    paddingRight: 12,
-    fontSize: 16,
+    paddingRight: Spacing.lg,
+    fontSize: FontSize.md,
+    color: C.text,
+    borderWidth: 1,
+    borderColor: C.border,
   },
-  filterButton: {
-    marginLeft: 10,
-    backgroundColor: '#eee',
-    borderRadius: 20,
-    padding: 8,
+  filterBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: BorderRadius.xl,
+    backgroundColor: C.primaryLight,
+    alignItems: 'center',
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#2ecc71',
-    paddingVertical: 16,
-    alignItems: 'center',
-    marginBottom: 12,
-    marginHorizontal: 120,
+  listContent: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.xxxl,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
+  postCard: {
+    flexDirection: 'row',
+    backgroundColor: C.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: C.border,
+    gap: Spacing.md,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: BorderRadius.md,
+  },
+  postBody: {
+    flex: 1,
+  },
+  postTitle: {
+    fontSize: FontSize.md,
+    fontWeight: '700',
+    color: C.text,
+    marginBottom: Spacing.xs,
+  },
+  postMeta: {
+    fontSize: FontSize.xs,
+    color: C.textSecondary,
+    marginBottom: Spacing.sm,
+  },
+  tagRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  sportBadge: {
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
+  },
+  sportBadgeText: {
+    fontSize: FontSize.xs,
+    fontWeight: '700',
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  locationText: {
+    fontSize: FontSize.xs,
+    color: C.textSecondary,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: Spacing.xxxl * 2,
+    gap: Spacing.md,
+  },
+  emptyText: {
+    fontSize: FontSize.md,
+    color: C.textSecondary,
   },
 })

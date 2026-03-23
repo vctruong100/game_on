@@ -1,110 +1,80 @@
 // app/screens/_layout.tsx
 
+import { Ionicons } from '@expo/vector-icons'
 import { Drawer } from 'expo-router/drawer'
 import React from 'react'
+import { Colors } from '../../constants'
 
-export default function RootLayout() {
+const C = Colors.light
+
+export default function ScreensLayout() {
   return (
-    <Drawer>
+    <Drawer
+      screenOptions={{
+        headerShown: false,
+        drawerActiveTintColor: C.primary,
+        drawerInactiveTintColor: C.textSecondary,
+        drawerStyle: { backgroundColor: C.background },
+        drawerLabelStyle: { fontSize: 15, fontWeight: '600' },
+      }}
+    >
       <Drawer.Screen
         name="profile"
         options={{
           title: 'Profile',
-          headerShown: false
+          drawerIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} />,
         }}
       />
-      <Drawer.Screen
-          name="messages"
-          options={{
-            title: 'Messages',
-            headerShown: false
-         }}
-      />
-      <Drawer.Screen
-          name="otherProfile"
-          options={{
-            title: 'Other Profile (hidden)',
-            headerShown: false,
-            drawerItemStyle: { display: 'none' }
-         }}
-      />
-      <Drawer.Screen
-          name="AddPostModal"
-          options={{
-            title: 'AddPostModal (hidden)',
-            headerShown: false,
-            drawerItemStyle: { display: 'none' }
-         }}
-      />
-      <Drawer.Screen
-          name="yourPosts"
-          options={{
-            title: 'Your Posts',
-            headerShown: false,
-         }}
-      />
-      {/*}
-      <Drawer.Screen
-        name="calendar"
-        options={{
-          title: 'Calendar',
-        }}
-      />
-      <Drawer.Screen
-        name="social"
-        options={{
-          title: 'Social',
-        }}
-      />
-      <Drawer.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-        }}
-      />
-      <Drawer.Screen
-        name="map"
-        options={{
-          title: 'Map',
-        }}
-      />
-      */}
       <Drawer.Screen
         name="forum"
         options={{
           title: 'Forum',
-          headerShown: false
+          drawerIcon: ({ color, size }) => <Ionicons name="chatbubbles-outline" size={size} color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="messages"
+        options={{
+          title: 'Messages',
+          drawerIcon: ({ color, size }) => <Ionicons name="mail-outline" size={size} color={color} />,
+        }}
+      />
+      <Drawer.Screen
+        name="yourPosts"
+        options={{
+          title: 'Your Posts',
+          drawerIcon: ({ color, size }) => <Ionicons name="document-text-outline" size={size} color={color} />,
         }}
       />
       <Drawer.Screen
         name="map"
         options={{
           title: 'Map',
-          headerShown: false
+          drawerIcon: ({ color, size }) => <Ionicons name="map-outline" size={size} color={color} />,
         }}
       />
       <Drawer.Screen
         name="login"
         options={{
           title: 'Logout',
-          headerShown: false
+          drawerIcon: ({ color, size }) => <Ionicons name="log-out-outline" size={size} color={color} />,
         }}
+      />
+      <Drawer.Screen
+        name="otherProfile"
+        options={{ drawerItemStyle: { display: 'none' } }}
+      />
+      <Drawer.Screen
+        name="AddPostModal"
+        options={{ drawerItemStyle: { display: 'none' } }}
       />
       <Drawer.Screen
         name="direct_message"
-        options={{
-          title: "Direct Message",
-          headerShown: false,
-          drawerItemStyle: {display: 'none'}
-        }}
+        options={{ drawerItemStyle: { display: 'none' } }}
       />
       <Drawer.Screen
         name="FilterScreen"
-        options={{
-          title: 'Filters (hidden)',
-          headerShown: false,
-          drawerItemStyle: { display: 'none' }
-        }}
+        options={{ drawerItemStyle: { display: 'none' } }}
       />
     </Drawer>
   )
